@@ -1,4 +1,37 @@
 from random import choice, randint
+from math import log10
+
+
+def insert(list, value, key=lambda x: x):
+    i = len(list) - 1
+    list[i] = value
+
+    while i > 0:
+        if key(list[i]) > key(list[i - 1]):
+            list[i], list[i - 1] = list[i - 1], list[i]
+
+        i -= 1
+
+    return list
+
+
+def digit(value):
+    if value == 0:
+        return 1
+
+    if value < 0:
+        return 1 + int(1 + log10(value))
+
+    return int(1 + log10(value))
+
+
+def max_digits(grid):
+    digits = 1
+    for value in grid:
+        if value != 0:
+            digits = max(digits, digit(value))
+    return digits
+
 
 def empty(grid):
     empty_slots = []
@@ -7,8 +40,8 @@ def empty(grid):
             empty_slots.append(slot)
     return empty_slots
 
-def random_add(grid, value = 2):
 
+def random_add(grid, value=2):
     empty_slots = empty(grid)
 
     if len(empty_slots) == 0:
@@ -20,8 +53,8 @@ def random_add(grid, value = 2):
 
     return grid
 
-def up(grid, rows, columns):
 
+def up(grid, rows, columns):
     merged = 0
 
     score = 0
@@ -30,8 +63,7 @@ def up(grid, rows, columns):
 
     for col in range(columns):
         for row in range(rows):
-
-            if grid[rows * row + col] == 0:
+            if grid[columns * row + col] == 0:
                 blocked = False
                 continue
 
@@ -40,19 +72,19 @@ def up(grid, rows, columns):
 
             while k > 0:
 
-                current = grid[col + rows * k]
-                previous = grid[col + rows * (k - 1)]
+                current = grid[col + columns * k]
+                previous = grid[col + columns * (k - 1)]
 
                 if previous == 0:
-                    grid[col + rows * (k - 1)], grid[col + rows * k] = grid[col + rows * k], grid[col + rows * (k - 1)]
+                    grid[col + columns * (k - 1)], grid[col + columns * k] = grid[col + columns * k], grid[col + columns * (k - 1)]
                     blocked = False
 
                 if merge and previous == current:
-                    grid[col + rows * (k - 1)] += current
+                    grid[col + columns * (k - 1)] += current
 
                     score += current << 1
 
-                    grid[col + rows * k] = 0
+                    grid[col + columns * k] = 0
 
                     merged += 1
 
@@ -64,8 +96,8 @@ def up(grid, rows, columns):
 
     return grid, score, blocked, merged
 
-def down(grid, rows, columns):
 
+def down(grid, rows, columns):
     score = 0
 
     merged = 0
@@ -75,7 +107,7 @@ def down(grid, rows, columns):
     for col in range(columns):
         for row in range(rows - 1, -1, -1):
 
-            if grid[rows * row + col] == 0:
+            if grid[columns * row + col] == 0:
                 blocked = False
                 continue
 
@@ -84,19 +116,19 @@ def down(grid, rows, columns):
 
             while k + 1 < rows:
 
-                current = grid[col + rows * k]
-                previous = grid[col + rows * (k + 1)]
+                current = grid[col + columns * k]
+                previous = grid[col + columns * (k + 1)]
 
                 if previous == 0:
-                    grid[col + rows * (k + 1)], grid[col + rows * k] = grid[col + rows * k], grid[col + rows * (k + 1)]
+                    grid[col + columns * (k + 1)], grid[col + columns * k] = grid[col + columns * k], grid[col + columns * (k + 1)]
                     blocked = False
 
                 if merge and previous == current:
-                    grid[col + rows * (k + 1)] += current
+                    grid[col + columns * (k + 1)] += current
 
                     score += current << 1
 
-                    grid[col + rows * k] = 0
+                    grid[col + columns * k] = 0
 
                     merged += 1
 
@@ -108,18 +140,18 @@ def down(grid, rows, columns):
 
     return grid, score, blocked, merged
 
-def right(grid, rows, columns):
 
+def right(grid, rows, columns):
     score = 0
     merged = 0
 
     blocked = True
 
-    for row in range(columns):
+    for row in range(rows):
 
-        for col in range(rows - 1, -1, -1):
+        for col in range(columns - 1, -1, -1):
 
-            if grid[rows * row + col] == 0:
+            if grid[columns * row + col] == 0:
                 blocked = False
                 continue
 
@@ -129,42 +161,42 @@ def right(grid, rows, columns):
 
             while k + 1 < columns:
 
-                current = grid[k + rows * row]
-                previous = grid[k + 1 + rows * row]
+                current = grid[k + columns * row]
+
+                previous = grid[k + 1 + columns * row]
 
                 if previous == 0:
-                    grid[rows * row + k + 1], grid[rows * row + k] = grid[rows * row + k], grid[rows * row + k + 1]
+                    grid[columns * row + k + 1], grid[columns * row + k] = grid[columns * row + k], grid[columns * row + k + 1]
                     blocked = False
 
                 if merge and previous == current:
-                    grid[k + 1 + rows * row] += current
+                    grid[k + 1 + columns * row] += current
 
                     score += current << 1
-                    grid[rows * row + k] = 0
+                    grid[columns * row + k] = 0
 
                     merged += 1
                     blocked = False
 
                     merge = False
 
-
                 k += 1
 
     return grid, score, blocked, merged
 
-def left(grid,rows, columns):
 
+def left(grid, rows, columns):
     score = 0
 
     merged = 0
 
     blocked = True
 
-    for row in range(columns):
+    for row in range(rows):
 
-        for col in range(rows):
+        for col in range(columns):
 
-            if grid[rows * row + col] == 0:
+            if grid[columns * row + col] == 0:
                 blocked = False
                 continue
 
@@ -174,19 +206,19 @@ def left(grid,rows, columns):
 
             while k > 0:
 
-                current = grid[k + rows * row]
-                previous = grid[k - 1 + rows * row]
+                current = grid[k + columns * row]
+                previous = grid[k - 1 + columns * row]
 
                 if previous == 0:
-                    grid[rows * row + k - 1], grid[rows * row + k] = grid[rows * row + k], grid[rows * row + k - 1]
+                    grid[columns * row + k - 1], grid[columns * row + k] = grid[columns * row + k], grid[columns * row + k - 1]
                     blocked = False
 
                 if merge and previous == current:
-                    grid[k - 1 + rows * row] += current
+                    grid[k - 1 + columns * row] += current
 
                     score += current << 1
 
-                    grid[rows * row + k] = 0
+                    grid[columns * row + k] = 0
 
                     merged += 1
 
@@ -198,16 +230,13 @@ def left(grid,rows, columns):
 
     return grid, score, blocked, merged
 
+
+# TODO at each depth remove the least scoring move
 def __maxSearch__(grid, rows, columns, moves, depth=6):
-
-    score = 0, 0, '0' * depth
-
-    list = []
+    max_score = -1, -1, '0'
     if depth == 1:
 
-        max_score = -1,-1,'0'
-
-        for index,move in enumerate(moves):
+        for index, move in enumerate(moves):
             copy = grid.copy()
             copy, score, blocked, merged = move(copy, rows, columns)
 
@@ -215,41 +244,48 @@ def __maxSearch__(grid, rows, columns, moves, depth=6):
 
         return max_score
 
-    possibles = []
-    for index,move in enumerate(moves):
+    next_states = [(-1,-1,0,0,0)] * 4
+
+    any_move_blocked = False
+
+    for index, move in enumerate(moves):
 
         copy = grid.copy()
 
         copy, score, blocked, merged = move(copy, rows, columns)
 
-        if not blocked:
-            possibles.append(move)
+        any_move_blocked = any_move_blocked | blocked
 
+        next_states = insert(next_states, (merged, score, blocked, copy, index), lambda x: x[:2])
+
+    if not any_move_blocked:
+        next_states.pop()
+
+    for state in next_states:
+        merged, score, blocked, copy, index = state
+
+        if not blocked:
             copy = random_add(copy)
 
-            way = __maxSearch__(copy, rows, columns, moves, depth-1)
+            way = __maxSearch__(copy, rows, columns, moves, depth - 1)
 
             way = merged + way[0], score + way[1], str(index) + way[2]
 
-            list.append(way)
+            max_score = max(max_score, way)
 
-    if list:
-        return max(list, key=lambda x: x[:2])
-
-    return 0, 0, str(randint(0, len(moves) - 1)) + "0" * (depth - 1)
-
+    return max_score
 
 
 if __name__ == '__main__':
     from time import perf_counter
 
-    grid = [0,0,0,0,
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0]
+    grid = [0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0]
 
     start = perf_counter()
 
-    __maxSearch__(grid,4,4,[up,down,right,left], depth=8)
+    __maxSearch__(grid, 4, 4, [up, down, right, left], depth=8)
 
     print(perf_counter() - start)
