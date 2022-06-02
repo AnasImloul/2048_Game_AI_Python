@@ -1,4 +1,6 @@
-from functions import up, down, right, left, random_add,  __maxSearch__
+from functions import digit, max_digits, up, down, right, left, random_add,  __maxSearch__
+
+
 
 class Grid:
 
@@ -8,6 +10,9 @@ class Grid:
 
         self.grid = [0 for i in range(self.rows * self.columns)]
 
+        self.grid = random_add(self.grid, 2)
+        self.grid = random_add(self.grid, 2)
+
         self.score = 0
 
         self.moves = [up, down, right, left]
@@ -15,12 +20,6 @@ class Grid:
         self.merged = 0
 
         self.blocked = False
-
-    def empty(self):
-        self.empty_slots = []
-        for slot,value in enumerate(self.grid):
-            if value == 0:
-                self.empty_slots.append(slot)
 
 
     def random_add(self, value = 2):
@@ -81,9 +80,10 @@ class Grid:
 
     def __str__(self):
         s=""
+        digits = max_digits(self.grid)
         for i,value in enumerate(self.grid):
 
-            s += str(value) + (" " if (i==0 or (i+1)%self.rows) else "\n")
+            s += str(value) + (" "*(2 + digits - digit(value)) if ((i==0 and self.columns != 1) or (i+1)%self.columns) else "\n")
 
         return s + f"Score : {self.score}\n"
 
